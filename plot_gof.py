@@ -9,19 +9,19 @@ def SetStyle():
     from matplotlib import rc
     import matplotlib as mpl
 
-    rc('font', family='serif')
-    rc('font', size=22)
-    rc('xtick', labelsize=15)
-    rc('ytick', labelsize=15)
-    rc('legend', fontsize=15)
-    mpl.rcParams.update({'font.size': 19})
-    mpl.rcParams['text.usetex'] = False
-    mpl.rcParams.update({'xtick.labelsize': 18})
-    mpl.rcParams.update({'ytick.labelsize': 18})
-    mpl.rcParams.update({'axes.labelsize': 18})
-    mpl.rcParams.update({'legend.frameon': False})
-    mpl.rcParams.update({'lines.linewidth': 2})
-    mpl.rcParams['figure.figsize'] = (9, 9)
+    rc("font", family="serif")
+    rc("font", size=22)
+    rc("xtick", labelsize=15)
+    rc("ytick", labelsize=15)
+    rc("legend", fontsize=15)
+    mpl.rcParams.update({"font.size": 19})
+    mpl.rcParams["text.usetex"] = False
+    mpl.rcParams.update({"xtick.labelsize": 18})
+    mpl.rcParams.update({"ytick.labelsize": 18})
+    mpl.rcParams.update({"axes.labelsize": 18})
+    mpl.rcParams.update({"legend.frameon": False})
+    mpl.rcParams.update({"lines.linewidth": 2})
+    mpl.rcParams["figure.figsize"] = (9, 9)
 
 
 def load_gof(json_file, mass):
@@ -59,7 +59,7 @@ def make_plot(obs, toys, pval, statistic, mass, output, title_right=""):
         histtype="stepfilled",
         color="0.7",
         edgecolor="black",
-        linewidth=1.0
+        linewidth=1.0,
     )
 
     # observed vertical line
@@ -68,7 +68,7 @@ def make_plot(obs, toys, pval, statistic, mass, output, title_right=""):
         linestyle="--",
         linewidth=2.0,
         color="black",
-        label=f"Observed (p = {pval:.4f})"
+        label=f"Observed (p = {pval:.4f})",
     )
 
     # labels

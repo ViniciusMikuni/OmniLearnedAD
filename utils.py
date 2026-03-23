@@ -2,21 +2,21 @@ import numpy as np
 import uproot
 import os
 
-SHAPE_NUISANCES = ['jes', 'jer', 'jms', 'jmr']
-WEIGHT_NUISANCES_CORR = ['pu', 'pref']
-WEIGHT_NUISANCES_INDEP = ['isr', 'fsr']
-TOPPT_PROCS = ['top_dijet']
-NO_ISR_FSR_PROCS = {'ww_dijet', 'wz_dijet', 'zz_dijet'}
-NO_SCALE_PROCS = {'ww_dijet', 'wz_dijet', 'zz_dijet'}
-NO_JES_JER_PROCS = {'ww_dijet', 'wz_dijet', 'zz_dijet'}
-SIGNAL_NAMES = ['dihiggs_dijet']
+SHAPE_NUISANCES = ["jes", "jer", "jms", "jmr"]
+WEIGHT_NUISANCES_CORR = ["pu", "pref"]
+WEIGHT_NUISANCES_INDEP = ["isr", "fsr"]
+TOPPT_PROCS = ["top_dijet"]
+NO_ISR_FSR_PROCS = {"ww_dijet", "wz_dijet", "zz_dijet"}
+NO_SCALE_PROCS = {"ww_dijet", "wz_dijet", "zz_dijet"}
+NO_JES_JER_PROCS = {"ww_dijet", "wz_dijet", "zz_dijet"}
+SIGNAL_NAMES = ["dihiggs_dijet"]
 
 
 def _obs1d(sample, mask):
     return sample.obs[mask][:, 0].ravel()
 
 
-def _w1d(sample, mask, name='nom'):
+def _w1d(sample, mask, name="nom"):
     return sample.weight(name=name)[mask][:, 0].ravel()
 
 
@@ -38,30 +38,33 @@ def _is_present(hist):
 
 def _qcd_bin_entries(bin_line, process_line, qcd_name, channel):
     return [
-        '1' if proc.startswith(f'{qcd_name}_bin_') and ch == channel else '-'
+        "1" if proc.startswith(f"{qcd_name}_bin_") and ch == channel else "-"
         for ch, proc in zip(bin_line, process_line)
     ]
 
 
 def _qcd_bin_unc_entries(bin_line, process_line, qcd_name, bin_idx, unc, channel):
-    target = f'{qcd_name}_bin_{bin_idx}'
-    value = f'{1 + unc:.4f}'
-    return [value if proc == target and ch == channel else '-' for ch, proc in zip(bin_line, process_line)]
+    target = f"{qcd_name}_bin_{bin_idx}"
+    value = f"{1 + unc:.4f}"
+    return [
+        value if proc == target and ch == channel else "-"
+        for ch, proc in zip(bin_line, process_line)
+    ]
 
 
 def _append_abcd_rateparams(lines, qcd_name, tag, year, n_bins):
     for b in range(1, n_bins + 1):
-        cr1_name = f'yield_{qcd_name}_CR1_bin_{b}_{year}_{tag}'
-        cr2_name = f'yield_{qcd_name}_CR2_bin_{b}_{year}_{tag}'
-        cr3_name = f'yield_{qcd_name}_CR3_bin_{b}_{year}_{tag}'
-        sr_name = f'yield_{qcd_name}_SR_bin_{b}_{year}_{tag}'
-        qcd_proc = f'{qcd_name}_bin_{b}'
+        cr1_name = f"yield_{qcd_name}_CR1_bin_{b}_{year}_{tag}"
+        cr2_name = f"yield_{qcd_name}_CR2_bin_{b}_{year}_{tag}"
+        cr3_name = f"yield_{qcd_name}_CR3_bin_{b}_{year}_{tag}"
+        sr_name = f"yield_{qcd_name}_SR_bin_{b}_{year}_{tag}"
+        qcd_proc = f"{qcd_name}_bin_{b}"
         lines += [
-            f'{cr1_name} rateParam {tag}_CR1 {qcd_proc} 1.0 [0,5]',
-            f'{cr2_name} rateParam {tag}_CR2 {qcd_proc} 1.0 [0,5]',
-            f'{cr3_name} rateParam {tag}_CR3 {qcd_proc} 1.0 [0,5]',
-            f'{sr_name}  rateParam {tag}_SR  {qcd_proc} (@0*@1/@2) {cr1_name},{cr3_name},{cr2_name}',
-            '',
+            f"{cr1_name} rateParam {tag}_CR1 {qcd_proc} 1.0 [0,5]",
+            f"{cr2_name} rateParam {tag}_CR2 {qcd_proc} 1.0 [0,5]",
+            f"{cr3_name} rateParam {tag}_CR3 {qcd_proc} 1.0 [0,5]",
+            f"{sr_name}  rateParam {tag}_SR  {qcd_proc} (@0*@1/@2) {cr1_name},{cr3_name},{cr2_name}",
+            "",
         ]
 
 
@@ -69,21 +72,22 @@ def SetStyle():
     from matplotlib import rc
     import matplotlib as mpl
 
-    rc('font', family='serif', size=22)
-    rc('xtick', labelsize=15)
-    rc('ytick', labelsize=15)
-    rc('legend', fontsize=15)
-    mpl.rcParams.update({
-        'font.size': 19,
-        'text.usetex': False,
-        'xtick.labelsize': 18,
-        'ytick.labelsize': 18,
-        'axes.labelsize': 18,
-        'legend.frameon': False,
-        'lines.linewidth': 2,
-        'figure.figsize': (9, 9),
-    })
-
+    rc("font", family="serif", size=22)
+    rc("xtick", labelsize=15)
+    rc("ytick", labelsize=15)
+    rc("legend", fontsize=15)
+    mpl.rcParams.update(
+        {
+            "font.size": 19,
+            "text.usetex": False,
+            "xtick.labelsize": 18,
+            "ytick.labelsize": 18,
+            "axes.labelsize": 18,
+            "legend.frameon": False,
+            "lines.linewidth": 2,
+            "figure.figsize": (9, 9),
+        }
+    )
 
 
 def make_th1(name, values, sumw2, edges, counts=None):
@@ -106,8 +110,8 @@ def make_th1(name, values, sumw2, edges, counts=None):
     fTsumwx2 = float(np.sum(values * bin_centers**2))
 
     fXaxis = uproot.writing.identify.to_TAxis(
-        fName='xaxis',
-        fTitle='',
+        fName="xaxis",
+        fTitle="",
         fNbins=n_bins,
         fXmin=float(edges[0]),
         fXmax=float(edges[-1]),
@@ -128,99 +132,94 @@ def make_th1(name, values, sumw2, edges, counts=None):
     )
 
 
-
-
-def _shape_row(nuisance, affected_procs, process_line, width=50, bin_line=None, bin_pattern=None):
+def _shape_row(
+    nuisance, affected_procs, process_line, width=50, bin_line=None, bin_pattern=None
+):
     if bin_line is None or bin_pattern is None:
-        vals = ['1' if p in affected_procs else '-' for p in process_line]
+        vals = ["1" if p in affected_procs else "-" for p in process_line]
     else:
         vals = [
-            '1' if (p in affected_procs and b.startswith(bin_pattern)) else '-'
+            "1" if (p in affected_procs and b.startswith(bin_pattern)) else "-"
             for b, p in zip(bin_line, process_line)
         ]
-    return f"{nuisance:<{width}} shape  " + '  '.join(vals)
+    return f"{nuisance:<{width}} shape  " + "  ".join(vals)
 
 
-
-def _lnN_row(nuisance, affected, process_line, width=50, bin_line=None, bin_pattern=None):
+def _lnN_row(
+    nuisance, affected, process_line, width=50, bin_line=None, bin_pattern=None
+):
     if bin_line is None or bin_pattern is None:
-        vals = [affected.get(p, '-') for p in process_line]
-        return f"{nuisance:<{width}} lnN  " + '  '.join(vals)
+        vals = [affected.get(p, "-") for p in process_line]
+        return f"{nuisance:<{width}} lnN  " + "  ".join(vals)
 
     # Filter by both process and bin pattern
     vals = [
-        affected[p] if (p in affected and bin_pattern in b) else '-'
+        affected[p] if (p in affected and bin_pattern in b) else "-"
         for b, p in zip(bin_line, process_line)
     ]
-    return f"{nuisance:<{width}} lnN  " + '  '.join(vals)
+    return f"{nuisance:<{width}} lnN  " + "  ".join(vals)
 
 
-def _write_systematics(lines, process_line, bkg_procs, mc_names, do_sys, bin_line, width=50):
+def _write_systematics(
+    lines, process_line, bkg_procs, mc_names, do_sys, bin_line, width=50
+):
     all_mc = set(bkg_procs) | set(SIGNAL_NAMES)
 
     lines.append(
         _lnN_row(
-            'lumi_13TeV',
+            "lumi_13TeV",
             {
-                **{s: '1.025' for s in SIGNAL_NAMES},
-                **{p: '1.025' for p in bkg_procs},
+                **{s: "1.025" for s in SIGNAL_NAMES},
+                **{p: "1.025" for p in bkg_procs},
             },
             process_line,
             width,
         )
     )
 
-    sf_v = ['wjets_dijet','zjets_dijet']
+    sf_v = ["wjets_dijet", "zjets_dijet"]
 
     lines.append(
         _lnN_row(
-            f'sf_v',
-            {
-                **{g: '1.5' for g in sf_v}
-            },
+            "sf_v",
+            {**{g: "1.5" for g in sf_v}},
             process_line,
             width,
             bin_line=bin_line,
-            bin_pattern='_SR',
+            bin_pattern="_SR",
         )
     )
 
-    sf_vv = ['wz_dijet','ww_dijet','zz_dijet']
+    sf_vv = ["wz_dijet", "ww_dijet", "zz_dijet"]
 
     lines.append(
         _lnN_row(
-            f'sf_vv',
-            {
-                **{g: '1.5' for g in sf_vv}
-            },
+            "sf_vv",
+            {**{g: "1.5" for g in sf_vv}},
             process_line,
             width,
             bin_line=bin_line,
-            bin_pattern='_SR',
+            bin_pattern="_SR",
         )
     )
 
-
-    sf_stop = ['stopw_dijet','stop_dijet']
+    sf_stop = ["stopw_dijet", "stop_dijet"]
 
     lines.append(
         _lnN_row(
-            f'sf_stop',
-            {
-                **{g: '1.5' for g in sf_stop}
-            },
+            "sf_stop",
+            {**{g: "1.5" for g in sf_stop}},
             process_line,
             width,
             bin_line=bin_line,
-            bin_pattern='_SR',
+            bin_pattern="_SR",
         )
     )
 
-    
     if not do_sys:
         return
 
-    lines.append('')
+    lines.append("")
 
     corr_samples = [s for s in all_mc if s not in NO_JES_JER_PROCS]
     for nuisance in SHAPE_NUISANCES + WEIGHT_NUISANCES_CORR:
@@ -228,20 +227,23 @@ def _write_systematics(lines, process_line, bkg_procs, mc_names, do_sys, bin_lin
 
     scale_samples = [s for s in mc_names if s not in NO_SCALE_PROCS]
     for sample in scale_samples:
-        lines.append(_shape_row(f'scale_{sample}', {sample}, process_line, width))
+        lines.append(_shape_row(f"scale_{sample}", {sample}, process_line, width))
 
     isr_fsr_samples = [s for s in mc_names if s not in NO_ISR_FSR_PROCS]
     for sample in isr_fsr_samples:
         for nuisance in WEIGHT_NUISANCES_INDEP:
-            lines.append(_shape_row(f'{nuisance}_{sample}', {sample}, process_line, width))
+            lines.append(
+                _shape_row(f"{nuisance}_{sample}", {sample}, process_line, width)
+            )
 
-    lines.append(_shape_row('toppt', set(TOPPT_PROCS) & all_mc, process_line, width))
+    lines.append(_shape_row("toppt", set(TOPPT_PROCS) & all_mc, process_line, width))
 
 
-
-def _print_yield_summary(regions, data_per_region, qcd_per_region, mc_hists_per_region, qcd_name, bin_edges):
+def _print_yield_summary(
+    regions, data_per_region, qcd_per_region, mc_hists_per_region, qcd_name, bin_edges
+):
     print(f"\n{'Region':<8} {'Process':<25} {'Yield':>12}")
-    print('-' * 47)
+    print("-" * 47)
     for region in regions:
         d_vals, _ = data_per_region[region]
         qcd_v, _ = qcd_per_region[region]
@@ -252,15 +254,12 @@ def _print_yield_summary(regions, data_per_region, qcd_per_region, mc_hists_per_
             print(f"{'':>8} {proc_name:<25} {vals.sum():>12.2f}")
 
 
-
 def hist_from_arrays(mass_arr, w_arr, bin_edges):
     return _hist_var_count(mass_arr, w_arr, bin_edges)
 
 
-
 def data_hist(data, mask, bin_edges):
     return _hist_and_var(_obs1d(data, mask), _w1d(data, mask), bin_edges)
-
 
 
 def get_abcd_prediction_per_region(data, mcs, cut, bin_edges):
@@ -281,22 +280,37 @@ def get_abcd_prediction_per_region(data, mcs, cut, bin_edges):
         if proc_name in SIGNAL_NAMES:
             continue
 
-        _, mb, mc_, md = abcd_pred(mc.prediction[:, 0], mc.prediction[:, 1], cut, cut, mc.mask)
-        for region_mask, acc, acc_sw2 in ((mb, mc_b, mc_b_sw2), (mc_, mc_c, mc_c_sw2), (md, mc_d, mc_d_sw2)):
-            vals, sw2 = _hist_and_var(_obs1d(mc, region_mask), _w1d(mc, region_mask), bin_edges)
+        _, mb, mc_, md = abcd_pred(
+            mc.prediction[:, 0], mc.prediction[:, 1], cut, cut, mc.mask
+        )
+        for region_mask, acc, acc_sw2 in (
+            (mb, mc_b, mc_b_sw2),
+            (mc_, mc_c, mc_c_sw2),
+            (md, mc_d, mc_d_sw2),
+        ):
+            vals, sw2 = _hist_and_var(
+                _obs1d(mc, region_mask), _w1d(mc, region_mask), bin_edges
+            )
             acc += vals
             acc_sw2 += sw2
 
     B, C, D = data_b - mc_b, data_c - mc_c, data_d - mc_d
-    B_sw2, C_sw2, D_sw2 = data_b_sw2 + mc_b_sw2, data_c_sw2 + mc_c_sw2, data_d_sw2 + mc_d_sw2
+    B_sw2, C_sw2, D_sw2 = (
+        data_b_sw2 + mc_b_sw2,
+        data_c_sw2 + mc_c_sw2,
+        data_d_sw2 + mc_d_sw2,
+    )
     abcd_vals = np.divide(D, C, out=np.zeros_like(D, dtype=float), where=C != 0) * B
 
     valid = (B != 0) & (C != 0) & (D != 0)
     abcd_sw2 = np.zeros_like(abcd_vals)
-    abcd_sw2[valid] = abcd_vals[valid]**2 * (
-        D_sw2[valid] / D[valid]**2 + C_sw2[valid] / C[valid]**2 + B_sw2[valid] / B[valid]**2
+    abcd_sw2[valid] = abcd_vals[valid] ** 2 * (
+        D_sw2[valid] / D[valid] ** 2
+        + C_sw2[valid] / C[valid] ** 2
+        + B_sw2[valid] / B[valid] ** 2
     )
     return abcd_vals, abcd_sw2, B, B_sw2, C, C_sw2, D, D_sw2
+
 
 def _qcd_shape_syst_name(pred_type, observable, size, year, tag):
     return f"qcd_shape_{pred_type}_{observable}_{size}_{year}"
@@ -305,6 +319,7 @@ def _qcd_shape_syst_name(pred_type, observable, size, year, tag):
 def _read_hist_values_edges(obj):
     vals, edges = obj.to_numpy(flow=False)
     return np.asarray(vals, dtype=np.float64), np.asarray(edges, dtype=np.float64)
+
 
 def add_qcd_shape_variations_to_root(
     output_path,
@@ -347,11 +362,13 @@ def add_qcd_shape_variations_to_root(
     nominal_hists = {}
     with uproot.open(output_path) as f_nom:
         for i in range(n_bins):
-            proc = f"{qcd_name}_bin_{i+1}"
+            proc = f"{qcd_name}_bin_{i + 1}"
             nominal_key = f"SR/{proc}"
 
             if nominal_key not in f_nom:
-                raise KeyError(f"Missing nominal histogram in output file: {nominal_key}")
+                raise KeyError(
+                    f"Missing nominal histogram in output file: {nominal_key}"
+                )
 
             obj = f_nom[nominal_key]
             nominal_vals, edges = _read_hist_values_edges(obj)
@@ -372,7 +389,7 @@ def add_qcd_shape_variations_to_root(
     # Write shape-varied per-bin templates
     with uproot.update(output_path) as fout:
         for i in range(n_bins):
-            proc = f"{qcd_name}_bin_{i+1}"
+            proc = f"{qcd_name}_bin_{i + 1}"
             nominal_vals, nominal_var, edges = nominal_hists[proc]
 
             up_factor = up_vals[i]
@@ -381,8 +398,8 @@ def add_qcd_shape_variations_to_root(
             up_hist_vals = nominal_vals * up_factor
             down_hist_vals = nominal_vals * down_factor
 
-            up_hist_sw2 = nominal_var * (up_factor ** 2)
-            down_hist_sw2 = nominal_var * (down_factor ** 2)
+            up_hist_sw2 = nominal_var * (up_factor**2)
+            down_hist_sw2 = nominal_var * (down_factor**2)
 
             fout[f"SR/{proc}_{nuisance}Up"] = make_th1(
                 f"{proc}_{nuisance}Up",
@@ -397,7 +414,8 @@ def add_qcd_shape_variations_to_root(
                 down_hist_sw2,
                 edges,
             )
-            
+
+
 def save_combine_histograms(
     output_path,
     bin_edges,
@@ -415,18 +433,18 @@ def save_combine_histograms(
 ):
     mcs_sys = mcs_sys or {}
     n_bins = len(bin_edges) - 1
-    qcd_name = f'QCD_{tag}'
-    regions = ['SR', 'CR1', 'CR2', 'CR3']
-    region_order = ['SR', 'CR1', 'CR2', 'CR3']
+    qcd_name = f"QCD_{tag}"
+    regions = ["SR", "CR1", "CR2", "CR3"]
+    region_order = ["SR", "CR1", "CR2", "CR3"]
 
     mask_sr, mask_cr1, mask_cr2, mask_cr3 = abcd_pred(
         data.prediction[:, 0], data.prediction[:, 1], cut, cut, data.mask
     )
     data_per_region = {
-        'SR': data_hist(data, mask_sr, bin_edges),
-        'CR1': data_hist(data, mask_cr1, bin_edges),
-        'CR2': data_hist(data, mask_cr2, bin_edges),
-        'CR3': data_hist(data, mask_cr3, bin_edges),
+        "SR": data_hist(data, mask_sr, bin_edges),
+        "CR1": data_hist(data, mask_cr1, bin_edges),
+        "CR2": data_hist(data, mask_cr2, bin_edges),
+        "CR3": data_hist(data, mask_cr3, bin_edges),
     }
 
     mc_hists_per_region = {r: {} for r in regions}
@@ -434,7 +452,10 @@ def save_combine_histograms(
         masks = get_region_masks(mc, cut)
         for region_idx, region_name in enumerate(region_order):
             mask = masks[region_idx]
-            mc_hists_per_region[region_name][proc_name] = (_obs1d(mc, mask), _w1d(mc, mask))
+            mc_hists_per_region[region_name][proc_name] = (
+                _obs1d(mc, mask),
+                _w1d(mc, mask),
+            )
 
     def _clip_negative(h):
         return np.maximum(h, 1e-5)
@@ -446,52 +467,71 @@ def save_combine_histograms(
 
         def _weight_sys(mask, var):
             masses = _obs1d(mc, mask)
-            h_up, sw2_up = _hist_and_var(masses, _w1d(mc, mask, f'{var}_up'), bin_edges)
-            h_down, sw2_down = _hist_and_var(masses, _w1d(mc, mask, f'{var}_down'), bin_edges)
+            h_up, sw2_up = _hist_and_var(masses, _w1d(mc, mask, f"{var}_up"), bin_edges)
+            h_down, sw2_down = _hist_and_var(
+                masses, _w1d(mc, mask, f"{var}_down"), bin_edges
+            )
             return (_clip_negative(h_up), sw2_up), (_clip_negative(h_down), sw2_down)
 
         for region_idx, region_name in enumerate(region_order):
             mask = nom_masks[region_idx]
 
             for wvar in WEIGHT_NUISANCES_CORR:
-                sys_hists_per_region[region_name][proc_name][wvar] = _weight_sys(mask, wvar)
+                sys_hists_per_region[region_name][proc_name][wvar] = _weight_sys(
+                    mask, wvar
+                )
 
             if proc_name not in NO_ISR_FSR_PROCS:
                 for wvar in WEIGHT_NUISANCES_INDEP:
-                    sys_hists_per_region[region_name][proc_name][f'{wvar}_{proc_name}'] = _weight_sys(mask, wvar)
+                    sys_hists_per_region[region_name][proc_name][
+                        f"{wvar}_{proc_name}"
+                    ] = _weight_sys(mask, wvar)
 
             if proc_name in TOPPT_PROCS:
-                sys_hists_per_region[region_name][proc_name]['toppt'] = _weight_sys(mask, 'toppt')
+                sys_hists_per_region[region_name][proc_name]["toppt"] = _weight_sys(
+                    mask, "toppt"
+                )
 
             masses = _obs1d(mc, mask)
             w_nom = _w1d(mc, mask)
-            w_scales = mc.weight(name='scale')[mask]
+            w_scales = mc.weight(name="scale")[mask]
             h_nom, _ = np.histogram(masses, bins=bin_edges, weights=w_nom)
             nom_sw2, _ = np.histogram(masses, bins=bin_edges, weights=w_nom**2)
-            h_scales = np.stack([
-                np.histogram(masses, bins=bin_edges, weights=w_scales[:, :, i][:,0].flatten())[0]
-                for i in range(6)
-            ], axis=0)
+            h_scales = np.stack(
+                [
+                    np.histogram(
+                        masses,
+                        bins=bin_edges,
+                        weights=w_scales[:, :, i][:, 0].flatten(),
+                    )[0]
+                    for i in range(6)
+                ],
+                axis=0,
+            )
 
-            with np.errstate(divide='ignore', invalid='ignore'):
+            with np.errstate(divide="ignore", invalid="ignore"):
                 ratios = np.where(h_nom > 0, h_scales / h_nom, 1.0)
 
             if not np.allclose(ratios, 1.0):
                 ratio_up = np.max(ratios, axis=0)
                 ratio_down = np.min(ratios, axis=0)
-                sys_hists_per_region[region_name][proc_name][f'scale_{proc_name}'] = (
+                sys_hists_per_region[region_name][proc_name][f"scale_{proc_name}"] = (
                     (_clip_negative(h_nom * ratio_up), nom_sw2 * ratio_up**2),
                     (_clip_negative(h_nom * ratio_down), nom_sw2 * ratio_down**2),
                 )
             else:
-                print(f'[!] Skipping scale_{proc_name} in {region_name}: envelope is trivial')
+                print(
+                    f"[!] Skipping scale_{proc_name} in {region_name}: envelope is trivial"
+                )
 
         for base in SHAPE_NUISANCES:
             for region_name in regions:
-                sys_hists_per_region[region_name][proc_name].setdefault(base, [None, None])
+                sys_hists_per_region[region_name][proc_name].setdefault(
+                    base, [None, None]
+                )
 
-            for direction in ('up', 'down'):
-                sys_key = f'{proc_name}_{base}_{direction}'
+            for direction in ("up", "down"):
+                sys_key = f"{proc_name}_{base}_{direction}"
                 if sys_key not in mcs_sys:
                     continue
 
@@ -501,9 +541,13 @@ def save_combine_histograms(
                     var_mask = var_masks[region_idx]
                     masses = _obs1d(mc_var, var_mask)
                     h, sw2 = _hist_and_var(masses, _w1d(mc_var, var_mask), bin_edges)
-                    sys_hists_per_region[region_name][proc_name][base][0 if direction == 'up' else 1] = (_clip_negative(h), sw2)
+                    sys_hists_per_region[region_name][proc_name][base][
+                        0 if direction == "up" else 1
+                    ] = (_clip_negative(h), sw2)
 
-    abcd_vals, abcd_sw2, _, _, _, _, _, _ = get_abcd_prediction_per_region(data, mcs, cut, bin_edges)
+    abcd_vals, abcd_sw2, _, _, _, _, _, _ = get_abcd_prediction_per_region(
+        data, mcs, cut, bin_edges
+    )
 
     def _qcd_in_region(region, d_vals, d_sw2):
         mc_sum, mc_sum_sw2 = np.zeros(n_bins), np.zeros(n_bins)
@@ -516,10 +560,10 @@ def save_combine_histograms(
         return np.maximum(d_vals - mc_sum, 0.0), np.zeros_like(d_sw2 + mc_sum_sw2)
 
     qcd_per_region = {
-        'SR': (abcd_vals, np.zeros_like(abcd_sw2)),
-        'CR1': _qcd_in_region('CR1', *data_per_region['CR1']),
-        'CR2': _qcd_in_region('CR2', *data_per_region['CR2']),
-        'CR3': _qcd_in_region('CR3', *data_per_region['CR3']),
+        "SR": (abcd_vals, np.zeros_like(abcd_sw2)),
+        "CR1": _qcd_in_region("CR1", *data_per_region["CR1"]),
+        "CR2": _qcd_in_region("CR2", *data_per_region["CR2"]),
+        "CR3": _qcd_in_region("CR3", *data_per_region["CR3"]),
     }
 
     with uproot.recreate(output_path) as f:
@@ -527,15 +571,19 @@ def save_combine_histograms(
             d_vals, d_sw2 = data_per_region[region]
             qcd_vals, qcd_sw2 = qcd_per_region[region]
 
-            f[f'{region}/data_obs'] = make_th1('data_obs', d_vals, d_sw2, bin_edges)
-            f[f'{region}/{qcd_name}'] = make_th1(qcd_name, qcd_vals, qcd_sw2, bin_edges)
+            f[f"{region}/data_obs"] = make_th1("data_obs", d_vals, d_sw2, bin_edges)
+            f[f"{region}/{qcd_name}"] = make_th1(qcd_name, qcd_vals, qcd_sw2, bin_edges)
 
-            for hist_name, th1 in make_per_bin_qcd(qcd_vals, qcd_sw2, bin_edges, process_name=qcd_name).items():
-                f[f'{region}/{hist_name}'] = th1
+            for hist_name, th1 in make_per_bin_qcd(
+                qcd_vals, qcd_sw2, bin_edges, process_name=qcd_name
+            ).items():
+                f[f"{region}/{hist_name}"] = th1
 
             for proc_name, (mass_arr, w_arr) in mc_hists_per_region[region].items():
                 vals, sw2, counts = hist_from_arrays(mass_arr, w_arr, bin_edges)
-                f[f'{region}/{proc_name}'] = make_th1(proc_name, vals, sw2, bin_edges, counts)
+                f[f"{region}/{proc_name}"] = make_th1(
+                    proc_name, vals, sw2, bin_edges, counts
+                )
 
                 if not do_sys:
                     continue
@@ -548,19 +596,19 @@ def save_combine_histograms(
                     h_down, sw2_down = down_pair
 
                     out_nuisance = nuisance
-                    
-                    f[f'{region}/{proc_name}_{out_nuisance}Up'] = make_th1(
-                        f'{proc_name}_{out_nuisance}Up', h_up, sw2_up, bin_edges
+
+                    f[f"{region}/{proc_name}_{out_nuisance}Up"] = make_th1(
+                        f"{proc_name}_{out_nuisance}Up", h_up, sw2_up, bin_edges
                     )
-                    f[f'{region}/{proc_name}_{out_nuisance}Down'] = make_th1(
-                        f'{proc_name}_{out_nuisance}Down', h_down, sw2_down, bin_edges
+                    f[f"{region}/{proc_name}_{out_nuisance}Down"] = make_th1(
+                        f"{proc_name}_{out_nuisance}Down", h_down, sw2_down, bin_edges
                     )
 
     # only new addition
     if qcd_shape_root is not None:
         if pred_type is None or observable is None or size is None:
             raise ValueError(
-                'pred_type, observable, and size are required when qcd_shape_root is provided'
+                "pred_type, observable, and size are required when qcd_shape_root is provided"
             )
 
         add_qcd_shape_variations_to_root(
@@ -573,8 +621,16 @@ def save_combine_histograms(
             year=year,
         )
 
-    print(f'[✓] Saved histograms to: {output_path}')
-    _print_yield_summary(regions, data_per_region, qcd_per_region, mc_hists_per_region, qcd_name, bin_edges)
+    print(f"[✓] Saved histograms to: {output_path}")
+    _print_yield_summary(
+        regions,
+        data_per_region,
+        qcd_per_region,
+        mc_hists_per_region,
+        qcd_name,
+        bin_edges,
+    )
+
 
 def write_datacard(
     output_path,
@@ -583,8 +639,8 @@ def write_datacard(
     mc_names,
     abcd_vals,
     data_per_cr,
-    year='2016',
-    tag='HHdijet',
+    year="2016",
+    tag="HHdijet",
     do_sys=False,
     qcd_sr_bin_unc=None,
     pred_type=None,
@@ -592,8 +648,8 @@ def write_datacard(
     size=None,
 ):
     n_bins = len(bin_edges) - 1
-    regions = ['SR', 'CR1', 'CR2', 'CR3']
-    qcd_name = f'QCD_{tag}'
+    regions = ["SR", "CR1", "CR2", "CR3"]
+    qcd_name = f"QCD_{tag}"
 
     # ---------------------------------------------------
     # Decide which background processes are present in each region
@@ -605,7 +661,7 @@ def write_datacard(
             for proc in mc_names:
                 if proc in SIGNAL_NAMES:
                     continue
-                key = f'{region}/{proc}'
+                key = f"{region}/{proc}"
                 if key not in f:
                     continue
                 if _is_present(f[key]):
@@ -615,19 +671,24 @@ def write_datacard(
     bkg_procs = sorted(set(p for plist in region_bkg_procs.values() for p in plist))
 
     lines = [
-        f'# Datacard for {tag} ABCD analysis — {year}',
-        f'imax {len(regions)}  number of channels',
-        'jmax *  number of backgrounds',
-        'kmax *  number of nuisance parameters',
-        '', '-' * 80,
+        f"# Datacard for {tag} ABCD analysis — {year}",
+        f"imax {len(regions)}  number of channels",
+        "jmax *  number of backgrounds",
+        "kmax *  number of nuisance parameters",
+        "",
+        "-" * 80,
         *[
-            f'shapes * {tag}_{r} {root_file} {r}/$PROCESS {r}/$PROCESS_$SYSTEMATIC'
+            f"shapes * {tag}_{r} {root_file} {r}/$PROCESS {r}/$PROCESS_$SYSTEMATIC"
             for r in regions
         ],
-        '', '-' * 80, '',
-        'bin          ' + '  '.join(f'{tag}_{r}' for r in regions),
-        'observation  ' + '  '.join(['-1'] * len(regions)),
-        '', '-' * 80, '',
+        "",
+        "-" * 80,
+        "",
+        "bin          " + "  ".join(f"{tag}_{r}" for r in regions),
+        "observation  " + "  ".join(["-1"] * len(regions)),
+        "",
+        "-" * 80,
+        "",
     ]
 
     bin_line, process_line, proc_idx_line, rate_line = [], [], [], []
@@ -635,64 +696,75 @@ def write_datacard(
     for region in regions:
         # signals
         for sig_idx, sig_name in enumerate(SIGNAL_NAMES):
-            bin_line.append(f'{tag}_{region}')
+            bin_line.append(f"{tag}_{region}")
             process_line.append(sig_name)
             proc_idx_line.append(str(sig_idx - len(SIGNAL_NAMES) + 1))
-            rate_line.append('-1')
+            rate_line.append("-1")
 
         # QCD per-bin processes
         for i in range(n_bins):
-            bin_line.append(f'{tag}_{region}')
-            process_line.append(f'{qcd_name}_bin_{i+1}')
+            bin_line.append(f"{tag}_{region}")
+            process_line.append(f"{qcd_name}_bin_{i + 1}")
             proc_idx_line.append(str(i + 1))
-            rate_line.append('-1')
+            rate_line.append("-1")
 
         # only backgrounds that actually exist in this region
         for j, proc in enumerate(region_bkg_procs[region]):
-            bin_line.append(f'{tag}_{region}')
+            bin_line.append(f"{tag}_{region}")
             process_line.append(proc)
             proc_idx_line.append(str(n_bins + 1 + j))
-            rate_line.append('-1')
+            rate_line.append("-1")
 
     lines += [
-        'bin      ' + '  '.join(bin_line),
-        'process  ' + '  '.join(process_line),
-        'process  ' + '  '.join(proc_idx_line),
-        'rate     ' + '  '.join(rate_line),
-        '', '-' * 80, '',
+        "bin      " + "  ".join(bin_line),
+        "process  " + "  ".join(process_line),
+        "process  " + "  ".join(proc_idx_line),
+        "rate     " + "  ".join(rate_line),
+        "",
+        "-" * 80,
+        "",
     ]
 
-    _write_systematics(lines, process_line, bkg_procs, mc_names, do_sys,bin_line)
+    _write_systematics(lines, process_line, bkg_procs, mc_names, do_sys, bin_line)
 
     # Optional QCD shape nuisance
     if pred_type is not None and observable is not None and size is not None:
-        nuisance = f'qcd_shape_{pred_type}_{observable}_{size}_{year}_{tag}'
-        entries = _qcd_bin_entries(bin_line, process_line, qcd_name, f'{tag}_SR')
-        lines.append(f"{nuisance:<50} shape  " + '  '.join(entries))
+        nuisance = f"qcd_shape_{pred_type}_{observable}_{size}_{year}_{tag}"
+        entries = _qcd_bin_entries(bin_line, process_line, qcd_name, f"{tag}_SR")
+        lines.append(f"{nuisance:<50} shape  " + "  ".join(entries))
 
     # Optional lnN per QCD bin
     if qcd_sr_bin_unc is not None:
         for i, unc in enumerate(qcd_sr_bin_unc, start=1):
-            entries = _qcd_bin_unc_entries(bin_line, process_line, qcd_name, i, unc, f'{tag}_SR')
-            lines.append(f"{('qcdnorm_sr_bin' + str(i - 1)):<50} lnN  " + '  '.join(entries))
+            entries = _qcd_bin_unc_entries(
+                bin_line, process_line, qcd_name, i, unc, f"{tag}_SR"
+            )
+            lines.append(
+                f"{('qcdnorm_sr_bin' + str(i - 1)):<50} lnN  " + "  ".join(entries)
+            )
 
-    lines += ['', '* autoMCStats 0 0 1', '', '-' * 80, '']
+    lines += ["", "* autoMCStats 0 0 1", "", "-" * 80, ""]
 
-    cr1_vals, _ = data_per_cr['CR1']
-    cr2_vals, _ = data_per_cr['CR2']
-    cr3_vals, _ = data_per_cr['CR3']
+    cr1_vals, _ = data_per_cr["CR1"]
+    cr2_vals, _ = data_per_cr["CR2"]
+    cr3_vals, _ = data_per_cr["CR3"]
 
     _append_abcd_rateparams(lines, qcd_name, tag, year, n_bins)
 
-    with open(output_path, 'w') as fout:
-        fout.write('\n'.join(lines))
-    print(f'[✓] Datacard written to: {output_path}')
+    with open(output_path, "w") as fout:
+        fout.write("\n".join(lines))
+    print(f"[✓] Datacard written to: {output_path}")
 
-    print(f"\n{'Bin':<6} {'CR1 (B)':>10} {'CR2 (C)':>10} {'CR3 (D)':>10} {'SR pred':>10}")
-    print('-' * 46)
+    print(
+        f"\n{'Bin':<6} {'CR1 (B)':>10} {'CR2 (C)':>10} {'CR3 (D)':>10} {'SR pred':>10}"
+    )
+    print("-" * 46)
     for i in range(n_bins):
-        print(f'  {i+1:<4} {cr1_vals[i]:>10.2f} {cr2_vals[i]:>10.2f} {cr3_vals[i]:>10.2f} {abcd_vals[i]:>10.2f}')
-        
+        print(
+            f"  {i + 1:<4} {cr1_vals[i]:>10.2f} {cr2_vals[i]:>10.2f} {cr3_vals[i]:>10.2f} {abcd_vals[i]:>10.2f}"
+        )
+
+
 def write_combined_datacard_from_existing(
     output_path,
     input_datacards,
@@ -701,15 +773,14 @@ def write_combined_datacard_from_existing(
     mc_names,
     data_per_cr,
     abcd_vals_dict,
-    year='2017',
+    year="2017",
     do_sys=False,
     qcd_sr_bin_unc=None,
     pred_type=None,
     observable=None,
-    size=None
+    size=None,
 ):
-
-    regions = ['SR', 'CR1', 'CR2', 'CR3']
+    regions = ["SR", "CR1", "CR2", "CR3"]
     tags = list(input_datacards.keys())
 
     if isinstance(bin_edges, dict):
@@ -736,7 +807,7 @@ def write_combined_datacard_from_existing(
                 for proc in mc_names:
                     if proc in SIGNAL_NAMES:
                         continue
-                    key = f'{region}/{proc}'
+                    key = f"{region}/{proc}"
                     if key not in f:
                         continue
                     if _is_present(f[key]):
@@ -752,65 +823,73 @@ def write_combined_datacard_from_existing(
         )
     )
 
-    sf_rateparams = ['top_dijet', 'wjets_dijet', 'zjets_dijet', 'stopw_dijet']
-    if 'dihiggs_dijet' in SIGNAL_NAMES:
-        sf_rateparams.append('dihiggs_dijet')
+    sf_rateparams = ["top_dijet", "wjets_dijet", "zjets_dijet", "stopw_dijet"]
+    if "dihiggs_dijet" in SIGNAL_NAMES:
+        sf_rateparams.append("dihiggs_dijet")
 
-    all_channels = [f'{tag}_{r}' for tag in tags for r in regions]
+    all_channels = [f"{tag}_{r}" for tag in tags for r in regions]
 
     lines = [
         f"# Combined datacard from: {', '.join(input_datacards.values())}",
-        f'# year: {year}',
-        f'imax {len(all_channels)}  number of channels',
-        'jmax *  number of backgrounds',
-        'kmax *  number of nuisance parameters',
-        '', '-' * 80,
+        f"# year: {year}",
+        f"imax {len(all_channels)}  number of channels",
+        "jmax *  number of backgrounds",
+        "kmax *  number of nuisance parameters",
+        "",
+        "-" * 80,
         *[
-            f'shapes * {tag}_{r} {root_files[tag]} {r}/$PROCESS {r}/$PROCESS_$SYSTEMATIC'
-            for tag in tags for r in regions
+            f"shapes * {tag}_{r} {root_files[tag]} {r}/$PROCESS {r}/$PROCESS_$SYSTEMATIC"
+            for tag in tags
+            for r in regions
         ],
-        '', '-' * 80, '',
-        'bin          ' + '  '.join(all_channels),
-        'observation  ' + '  '.join(['-1'] * len(all_channels)),
-        '', '-' * 80, '',
+        "",
+        "-" * 80,
+        "",
+        "bin          " + "  ".join(all_channels),
+        "observation  " + "  ".join(["-1"] * len(all_channels)),
+        "",
+        "-" * 80,
+        "",
     ]
 
     bin_line, process_line, proc_idx_line, rate_line = [], [], [], []
 
     for tag in tags:
-        qcd_name = f'QCD_{tag}'
+        qcd_name = f"QCD_{tag}"
         n_bins = n_bins_dict[tag]
 
         for region in regions:
-            ch = f'{tag}_{region}'
+            ch = f"{tag}_{region}"
 
             # signals
             for sig_idx, sig_name in enumerate(SIGNAL_NAMES):
                 bin_line.append(ch)
                 process_line.append(sig_name)
                 proc_idx_line.append(str(sig_idx - len(SIGNAL_NAMES) + 1))
-                rate_line.append('-1')
+                rate_line.append("-1")
 
             # per-bin QCD
             for i in range(n_bins):
                 bin_line.append(ch)
-                process_line.append(f'{qcd_name}_bin_{i+1}')
+                process_line.append(f"{qcd_name}_bin_{i + 1}")
                 proc_idx_line.append(str(i + 1))
-                rate_line.append('-1')
+                rate_line.append("-1")
 
             # only backgrounds that actually exist in this tag/region
             for j, proc in enumerate(region_bkg_procs[tag][region]):
                 bin_line.append(ch)
                 process_line.append(proc)
                 proc_idx_line.append(str(n_bins + 1 + j))
-                rate_line.append('-1')
+                rate_line.append("-1")
 
     lines += [
-        'bin      ' + '  '.join(bin_line),
-        'process  ' + '  '.join(process_line),
-        'process  ' + '  '.join(proc_idx_line),
-        'rate     ' + '  '.join(rate_line),
-        '', '-' * 80, '',
+        "bin      " + "  ".join(bin_line),
+        "process  " + "  ".join(process_line),
+        "process  " + "  ".join(proc_idx_line),
+        "rate     " + "  ".join(rate_line),
+        "",
+        "-" * 80,
+        "",
     ]
 
     _write_systematics(lines, process_line, bkg_procs, mc_names, do_sys, bin_line)
@@ -818,11 +897,11 @@ def write_combined_datacard_from_existing(
     # QCD shape systematics
     if pred_type is not None and observable is not None and size is not None:
         for tag in tags:
-            nuisance = f'qcd_shape_{pred_type}_{observable}_{size}_{year}'
-            qcd_name = f'QCD_{tag}'
+            nuisance = f"qcd_shape_{pred_type}_{observable}_{size}_{year}"
+            qcd_name = f"QCD_{tag}"
 
-            entries = _qcd_bin_entries(bin_line, process_line, qcd_name, f'{tag}_SR')
-            lines.append(f"{nuisance:<50} shape  " + '  '.join(entries))
+            entries = _qcd_bin_entries(bin_line, process_line, qcd_name, f"{tag}_SR")
+            lines.append(f"{nuisance:<50} shape  " + "  ".join(entries))
 
     # Optional lnN per QCD bin
     for tag in tags:
@@ -830,7 +909,7 @@ def write_combined_datacard_from_existing(
         if tag_unc is None:
             continue
 
-        qcd_name = f'QCD_{tag}'
+        qcd_name = f"QCD_{tag}"
         n_bins = n_bins_dict[tag]
 
         if len(tag_unc) != n_bins:
@@ -840,37 +919,44 @@ def write_combined_datacard_from_existing(
             )
 
         for i, unc in enumerate(tag_unc, start=1):
-            entries = _qcd_bin_unc_entries(bin_line, process_line, qcd_name, i, unc, f'{tag}_SR')
-            lines.append(f"{('qcdnorm_sr_' + tag + '_bin' + str(i - 1)):<50} lnN  " + '  '.join(entries))
+            entries = _qcd_bin_unc_entries(
+                bin_line, process_line, qcd_name, i, unc, f"{tag}_SR"
+            )
+            lines.append(
+                f"{('qcdnorm_sr_' + tag + '_bin' + str(i - 1)):<50} lnN  "
+                + "  ".join(entries)
+            )
 
-    lines += ['', '* autoMCStats 0 0 1', '', '-' * 80, '']
+    lines += ["", "* autoMCStats 0 0 1", "", "-" * 80, ""]
 
     # Existing floating normalizations
     for proc in sf_rateparams:
-        lines.append(f'sf_{year}_SR rateParam *_SR {proc} 0.5 [0,1]')
+        lines.append(f"sf_{year}_SR rateParam *_SR {proc} 0.5 [0,1]")
 
-    lines += ['', '-' * 80, '']
+    lines += ["", "-" * 80, ""]
 
     # ABCD rateParams for each tag
     for tag in tags:
-        qcd_name = f'QCD_{tag}'
+        qcd_name = f"QCD_{tag}"
         n_bins = n_bins_dict[tag]
 
-        lines.append(f'# ABCD rateParams for {tag} (uncorrelated)')
+        lines.append(f"# ABCD rateParams for {tag} (uncorrelated)")
 
         _append_abcd_rateparams(lines, qcd_name, tag, year, n_bins)
-        lines.append('')
+        lines.append("")
 
-    with open(output_path, 'w') as fout:
-        fout.write('\n'.join(lines))
+    with open(output_path, "w") as fout:
+        fout.write("\n".join(lines))
 
-    print(f'[✓] Combined datacard written to: {output_path}')
-    print(f'    Channels        : {len(all_channels)} ({len(tags)} tags × {len(regions)} regions)')
+    print(f"[✓] Combined datacard written to: {output_path}")
+    print(
+        f"    Channels        : {len(all_channels)} ({len(tags)} tags × {len(regions)} regions)"
+    )
     print("    Free-floating   : ['top_dijet']")
     print(f"    Uncorrelated QCD: {[f'QCD_{t} ({n_bins_dict[t]} bins)' for t in tags]}")
 
-    
-def make_per_bin_qcd(vals, sw2, edges, process_name='QCD'):
+
+def make_per_bin_qcd(vals, sw2, edges, process_name="QCD"):
     n_bins = len(vals)
     hists = {}
     for i in range(n_bins):
@@ -878,16 +964,14 @@ def make_per_bin_qcd(vals, sw2, edges, process_name='QCD'):
         bin_sw2 = np.zeros(n_bins)
         bin_vals[i] = vals[i]
         bin_sw2[i] = sw2[i]
-        hists[f'{process_name}_bin_{i+1}'] = make_th1(
-            f'{process_name}_bin_{i+1}', bin_vals, bin_sw2, edges
+        hists[f"{process_name}_bin_{i + 1}"] = make_th1(
+            f"{process_name}_bin_{i + 1}", bin_vals, bin_sw2, edges
         )
     return hists
 
 
-
 def get_region_masks(mc, cut):
     return abcd_pred(mc.prediction[:, 0], mc.prediction[:, 1], cut, cut, mc.mask)
-
 
 
 def abcd_pred(p1, p2, cut1, cut2, mask=None):
@@ -900,16 +984,15 @@ def abcd_pred(p1, p2, cut1, cut2, mask=None):
     return mask_a, mask_b, mask_c, mask_d
 
 
-
 class EventData:
     SYS_INDEX = {
-        "jes_up":   (18, 19),
+        "jes_up": (18, 19),
         "jes_down": (20, 21),
-        "jer_up":   (22, 23),
+        "jer_up": (22, 23),
         "jer_down": (24, 25),
-        "jms_up":   (26, 27),
+        "jms_up": (26, 27),
         "jms_down": (28, 29),
-        "jmr_up":   (30, 31),
+        "jmr_up": (30, 31),
         "jmr_down": (32, 33),
     }
 
@@ -970,7 +1053,6 @@ class EventData:
         self._sort()
         self.mask = self._get_mask()
 
-
     @classmethod
     def from_npz_folder(
         cls,
@@ -984,17 +1066,29 @@ class EventData:
         observable="mass",
     ):
         keys = [
-            "predictions", "dimasses", "masses", "pts", "etas",
-            "btags", "htags", "tau21s", "obs", "weights", "masks"
+            "predictions",
+            "dimasses",
+            "masses",
+            "pts",
+            "etas",
+            "btags",
+            "htags",
+            "tau21s",
+            "obs",
+            "weights",
+            "masks",
         ]
         acc = {k: [] for k in keys}
 
         files = [
-            f for f in os.listdir(folder)
+            f
+            for f in os.listdir(folder)
             if pattern in f and f.endswith(".npz") and "ad" not in f
         ]
         if not files:
-            raise RuntimeError(f"No matching .npz files found for pattern {pattern!r} in {folder!r}")
+            raise RuntimeError(
+                f"No matching .npz files found for pattern {pattern!r} in {folder!r}"
+            )
 
         for file_name in files:
             data = np.load(os.path.join(folder, file_name))
@@ -1011,7 +1105,9 @@ class EventData:
             acc["weights"].append(weight)
             acc["btags"].append(btag)
             acc["htags"].append(htag)
-            acc["masks"].append((cond[:, 14] == 1.0) & (cond[:, 16] == 0.0) & (cond[:, 17] == 0.0))
+            acc["masks"].append(
+                (cond[:, 14] == 1.0) & (cond[:, 16] == 0.0) & (cond[:, 17] == 0.0)
+            )
             acc["tau21s"].append(cond[:, 7] / (cond[:, 6] + 1e-6))
 
             pt, mass = cls._extract_pt_mass(cond, sys)
@@ -1043,7 +1139,9 @@ class EventData:
         weight = np.concatenate(acc["weights"], axis=0)
 
         def reshape(arr, extra_dim=False):
-            return arr.reshape(-1, 2, arr.shape[-1]) if extra_dim else arr.reshape(-1, 2)
+            return (
+                arr.reshape(-1, 2, arr.shape[-1]) if extra_dim else arr.reshape(-1, 2)
+            )
 
         return cls(
             name,
@@ -1069,7 +1167,9 @@ class EventData:
             return np.exp(cond[:, 0]), np.exp(cond[:, 3])
 
         if sys not in EventData.SYS_INDEX:
-            raise ValueError(f"Unknown sys: {sys!r}. Valid options: {list(EventData.SYS_INDEX)}")
+            raise ValueError(
+                f"Unknown sys: {sys!r}. Valid options: {list(EventData.SYS_INDEX)}"
+            )
 
         pt_col, mass_col = EventData.SYS_INDEX[sys]
         return cond[:, pt_col], cond[:, mass_col]
@@ -1087,7 +1187,7 @@ class EventData:
         e1 = np.sqrt(mass[:, 0] ** 2 + (pt[:, 0] * np.cosh(dijets[:, 0, 1])) ** 2)
         e2 = np.sqrt(mass[:, 1] ** 2 + (pt[:, 1] * np.cosh(dijets[:, 1, 1])) ** 2)
 
-        m2 = (e1 + e2) ** 2 - (px ** 2 + py ** 2 + pz ** 2)
+        m2 = (e1 + e2) ** 2 - (px**2 + py**2 + pz**2)
         m2 = np.maximum(m2, 0.0)
         m = np.repeat(np.sqrt(m2)[:, None], 2, axis=0)
         return m[:, 0]
@@ -1130,7 +1230,6 @@ class EventData:
     def _get_mask(self, tau_cut=0.45, pt_cut=450):
         pt_mask = np.min(self.pt, axis=1) > pt_cut
         tau21_mask = np.max(self.tau21, axis=1) < tau_cut
-        dimass_mask = self.dimass[:, 0] > 1000
         event_mask = self.event_mask[:, 0]
         mass_mask = np.min(self.mass, axis=1) > 60
 
@@ -1146,9 +1245,16 @@ class EventData:
             case "SR2":
                 return self.base_mask & tau21_mask & (self.mass[:, 1] < 100)
             case "SR3":
-                return self.base_mask & tau21_mask & (self.mass[:, 1] > 100) & (np.max(self.btag, axis=1) > 0.5847)
+                return (
+                    self.base_mask
+                    & tau21_mask
+                    & (self.mass[:, 1] > 100)
+                    & (np.max(self.btag, axis=1) > 0.5847)
+                )
             case "SR4":
-                return self.base_mask & tau21_mask & (np.max(self.btag, axis=1) > 0.5847)
+                return (
+                    self.base_mask & tau21_mask & (np.max(self.btag, axis=1) > 0.5847)
+                )
             case _:
                 raise ValueError(f"Unknown region_type: {self.region_type!r}")
 
