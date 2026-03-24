@@ -3,7 +3,7 @@
 In this repository you will be able to reproduce all the resuls presented in the paper based on multiple Jupyter Notebooks
 
 
-![Visualization of PET](./assets/efficiency_scan.gif)
+![Visualization of efficiency](./assets/efficiency_scan.gif)
 
 
 ## Installation
@@ -17,7 +17,7 @@ In addition to the basic python libraries you will also need to install the Higg
 
 ## Data
 
-We provide npz files containing all the necessary information for both data and simulated processes used in this work available from Zenodo
+We provide npz files containing all the necessary information for both data and simulated processes used in this work available from [Zenodo](https://doi.org/10.5281/zenodo.19181048)
 
 
 
