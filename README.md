@@ -2,6 +2,7 @@
 
 In this repository you will be able to reproduce all the resuls presented in the paper based on multiple Jupyter Notebooks
 
+```
 @article{Mikuni:2026ced,
     author = "Mikuni, Vinicius and Nachman, Benjamin",
     title = "{Searching for Anomalies with Foundation Models}",
@@ -11,7 +12,7 @@ In this repository you will be able to reproduce all the resuls presented in the
     month = "3",
     year = "2026"
 }
-
+```
 
 ![Visualization of efficiency](./assets/efficiency_scan.gif)
 
